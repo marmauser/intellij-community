@@ -295,7 +295,7 @@ public abstract class GradleImportingTestCase extends JavaExternalSystemImportin
     importProject();
   }
 
-  protected void importProject() {
+  public void importProject() {
     importProject((Boolean)null);
   }
 
