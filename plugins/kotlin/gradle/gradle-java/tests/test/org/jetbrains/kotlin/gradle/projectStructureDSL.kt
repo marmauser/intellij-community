@@ -118,13 +118,13 @@ class ProjectInfo(
 class ModuleInfo(val module: Module, val projectInfo: ProjectInfo) {
     // data source
     private val rootModel = module.rootManager
-    // data storage
+    // matcher data storage
     private val expectedDependencyNames = HashSet<String>()
-    // data storage
+    // matcher data storage
     private val expectedDependencies = HashSet<OrderEntry>()
-    // data storage
+    // matcher data storage
     private val expectedSourceRoots = HashSet<String>()
-    // data storage
+    // matcher data storage
     private val expectedExternalSystemTestTasks = ArrayList<ExternalSystemTestRunTask>()
     // Matcher storage
     private val assertions = mutableListOf<(ModuleInfo) -> Unit>()

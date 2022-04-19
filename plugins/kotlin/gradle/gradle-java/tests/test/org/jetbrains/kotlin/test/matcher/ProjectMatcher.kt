@@ -2,8 +2,8 @@
 package org.jetbrains.kotlin.test.matcher
 
 import org.jetbrains.kotlin.gradle.Reporter
-import org.jetbrains.kotlin.test.domain.ModuleEntity
-import org.jetbrains.kotlin.test.domain.ProjectEntity
+import org.jetbrains.kotlin.projectModel.ModuleEntity
+import org.jetbrains.kotlin.projectModel.ProjectEntity
 
 class ProjectMatcher(
     val projectEntity: ProjectEntity,
@@ -32,7 +32,7 @@ class ProjectMatcher(
             }
             return
         }
-        ModuleMatcher(ModuleEntity.fromOpenapiModule(module), reporter).apply { matcherFunc() }
+        ModuleMatcher(ModuleEntity.fromOpenapiModule(module, projectEntity), reporter).apply { matcherFunc() }
     }
 
 }

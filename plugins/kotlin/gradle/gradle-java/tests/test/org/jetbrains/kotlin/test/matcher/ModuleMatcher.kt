@@ -8,7 +8,7 @@ import com.intellij.openapi.util.io.systemIndependentPath
 import org.jetbrains.kotlin.gradle.Reporter
 import org.jetbrains.kotlin.gradle.toIoFile
 import org.jetbrains.kotlin.platform.TargetPlatform
-import org.jetbrains.kotlin.test.domain.ModuleEntity
+import org.jetbrains.kotlin.projectModel.ModuleEntity
 import java.io.File
 
 class ModuleMatcher(val moduleEntity: ModuleEntity, val reporter: Reporter) : MatcherModel() {
