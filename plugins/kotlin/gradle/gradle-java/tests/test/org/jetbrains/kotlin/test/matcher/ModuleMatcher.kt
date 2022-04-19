@@ -11,6 +11,10 @@ import org.jetbrains.kotlin.platform.TargetPlatform
 import org.jetbrains.kotlin.projectModel.ModuleEntity
 import java.io.File
 
+/**
+ * Matcher for [ModuleEntity].
+ * Contains methods for asserting data in actual model
+ */
 class ModuleMatcher(val moduleEntity: ModuleEntity, val reporter: Reporter) : MatcherModel() {
     override fun report(message: String) {
         reporter.report(message)

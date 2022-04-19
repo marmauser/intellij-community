@@ -30,6 +30,9 @@ import java.io.File
 import org.jetbrains.plugins.gradle.util.GradleUtil
 import kotlin.test.fail
 
+/**
+ * Represents objects which collect events and then check them
+ */
 interface Reporter {
     fun report(message: String)
     fun check()

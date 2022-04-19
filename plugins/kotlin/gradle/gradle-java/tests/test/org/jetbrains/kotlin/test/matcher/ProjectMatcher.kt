@@ -5,6 +5,10 @@ import org.jetbrains.kotlin.gradle.Reporter
 import org.jetbrains.kotlin.projectModel.ModuleEntity
 import org.jetbrains.kotlin.projectModel.ProjectEntity
 
+/**
+ * Matcher for [ProjectMatcher].
+ * Contains methods for asserting data in actual model
+ */
 class ProjectMatcher(
     val projectEntity: ProjectEntity,
     val reporter: Reporter,
@@ -24,6 +28,9 @@ class ProjectMatcher(
         allModulesAsserter = body
     }
 
+    /**
+     * DSL method defining check for [ModuleEntity]
+     */
     fun module(name: String, isOptional: Boolean = false, matcherFunc: ModuleMatcher.() -> Unit = {}) {
         val module = projectEntity.moduleManager.findModuleByName(name)
         if (module == null) {
@@ -37,6 +44,9 @@ class ProjectMatcher(
 
 }
 
+/**
+ * DSL method to start [ProjectEntity] check
+ */
 fun checkProjectEntity(
     projectEntity: ProjectEntity,
     reporter: Reporter,

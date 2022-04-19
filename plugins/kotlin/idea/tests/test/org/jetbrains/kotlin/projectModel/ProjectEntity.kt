@@ -6,6 +6,12 @@ import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.project.Project
 import org.jetbrains.kotlin.idea.configuration.GRADLE_SYSTEM_ID
 
+/**
+ * Entity representing Project
+ * can be obtained from Openapi [Project], or by DSL entry fun [project]
+ * can be converted to [ProjectResolveModel]
+ * Will be joined with [ProjectResolveModel] to unified entity
+ */
 class ProjectEntity() {
     lateinit var project: Project
     lateinit var projectPath: String

@@ -14,6 +14,12 @@ import org.jetbrains.kotlin.platform.TargetPlatform
 import java.io.File
 import kotlin.properties.Delegates
 
+/**
+ * Entity representing Module of project
+ * can be obtained from Openapi [Module], or [ResolveModule]
+ * can be converted to [ResolveModule]
+ * Will be joined with [ResolveModule] to unified entity
+ */
 class ModuleEntity(val name: String, val projectEntity: ProjectEntity) {
 
     lateinit var actualVersion: String
