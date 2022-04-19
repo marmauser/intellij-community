@@ -47,6 +47,7 @@ import org.jetbrains.kotlin.idea.codeMetaInfo.renderConfigurations.HighlightingC
 import org.jetbrains.kotlin.idea.codeMetaInfo.renderConfigurations.LineMarkerConfiguration
 import org.jetbrains.kotlin.idea.multiplatform.setupMppProjectFromDirStructure
 import org.jetbrains.kotlin.idea.multiplatform.setupMppProjectFromTextFile
+import org.jetbrains.kotlin.idea.multiplatform.setupMppProjectFromTextFileWithEntity
 import org.jetbrains.kotlin.idea.resolve.dataFlowValueFactory
 import org.jetbrains.kotlin.idea.resolve.languageVersionSettings
 import org.jetbrains.kotlin.idea.stubs.AbstractMultiModuleTest
@@ -278,10 +279,37 @@ abstract class AbstractCodeMetaInfoTest : AbstractMultiModuleTest() {
         }
     }
 
+    protected open fun setupProjectWithEntity(testDataRoot: File) {
+        val dependenciesTxt = testDataRoot.resolve("dependencies.txt")
+        if (dependenciesTxt.exists()) {
+            setupMppProjectFromTextFileWithEntity(testDataRoot)
+        } else {
+            setupMppProjectFromDirStructure(testDataRoot)
+        }
+    }
+
     fun doTest(testDataPath: String) {
         val testRoot = File(testDataPath)
         val checker = CodeMetaInfoTestCase(getConfigurations(), checkNoDiagnosticError)
         setupProject(testRoot)
+
+        for (module in ModuleManager.getInstance(project).modules) {
+            for (sourceRoot in module.sourceRoots) {
+                VfsUtilCore.processFilesRecursively(sourceRoot) { file ->
+                    if (file.isDirectory) return@processFilesRecursively true
+                    runInEdtAndWait {
+                        checker.checkFile(file, file.findCorrespondingFileInTestDir(sourceRoot, testRoot), project)
+                    }
+                    true
+                }
+            }
+        }
+    }
+
+    fun doTestWithEntity(testDataPath: String) {
+        val testRoot = File(testDataPath)
+        val checker = CodeMetaInfoTestCase(getConfigurations(), checkNoDiagnosticError)
+        setupProjectWithEntity(testRoot)
 
         for (module in ModuleManager.getInstance(project).modules) {
             for (sourceRoot in module.sourceRoots) {

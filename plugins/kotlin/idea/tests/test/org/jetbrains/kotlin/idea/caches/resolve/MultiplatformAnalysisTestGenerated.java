@@ -28,6 +28,11 @@ public class MultiplatformAnalysisTestGenerated extends AbstractMultiplatformAna
         runTest("testData/multiplatform/aliasesTypeMismatch/");
     }
 
+    @TestMetadata("aliasesTypeMismatch")
+    public void testAliasesTypeMismatchWithEntity() throws Exception {
+        KotlinTestUtils.runTest(this::doTestWithEntity, this, "testData/multiplatform/aliasesTypeMismatch/");
+    }
+
     @TestMetadata("builtinsAndStdlib")
     public void testBuiltinsAndStdlib() throws Exception {
         runTest("testData/multiplatform/builtinsAndStdlib/");

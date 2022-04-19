@@ -30,14 +30,22 @@ import java.io.File
 import org.jetbrains.plugins.gradle.util.GradleUtil
 import kotlin.test.fail
 
-class MessageCollector {
+/**
+ * Represents objects which collect events and then check them
+ */
+interface Reporter {
+    fun report(message: String)
+    fun check()
+}
+
+class MessageCollector : Reporter {
     private val builder = StringBuilder()
 
-    fun report(message: String) {
+    override fun report(message: String) {
         builder.append(message).append("\n\n")
     }
 
-    fun check() {
+    override fun check() {
         val message = builder.toString()
         if (message.isNotEmpty()) {
             fail("\n\n" + message)
@@ -47,8 +55,10 @@ class MessageCollector {
 
 @Suppress("UnstableApiUsage")
 class ProjectInfo(
+    // Accessor point
     project: Project,
     internal val projectPath: String,
+    // Matcher configuration
     internal val exhaustiveModuleList: Boolean,
     internal val exhaustiveSourceSourceRootList: Boolean,
     internal val exhaustiveDependencyList: Boolean,
@@ -56,16 +66,25 @@ class ProjectInfo(
 ) {
     val messageCollector = MessageCollector()
 
+    // Accessor for modules
     private val moduleManager = ModuleManager.getInstance(project)
+
+    // Accessor for project
     private val projectDataNode = ExternalSystemApiUtil.findProjectData(project, GRADLE_SYSTEM_ID, projectPath)
+
+    // Matching data
     private val expectedModuleNames = HashSet<String>()
+
+    // Matcher func
     private var allModulesAsserter: (ModuleInfo.() -> Unit)? = null
 
+    // DSL definition Matcher func
     fun allModules(body: ModuleInfo.() -> Unit) {
         assert(allModulesAsserter == null)
         allModulesAsserter = body
     }
 
+    // DSL
     fun module(name: String, isOptional: Boolean = false, body: ModuleInfo.() -> Unit = {}) {
         val module = moduleManager.findModuleByName(name)
         if (module == null) {
@@ -76,11 +95,14 @@ class ProjectInfo(
         }
 
         val moduleInfo = ModuleInfo(module, this)
+
+        // ---------
         allModulesAsserter?.let { moduleInfo.it() }
-        moduleInfo.run(body)
+        moduleInfo.run(body)    // run() - is Entity definition and Matcher call
         expectedModuleNames += name
     }
 
+    // DSL Matcher call
     fun run(body: ProjectInfo.() -> Unit = {}) {
         body()
 
@@ -95,16 +117,23 @@ class ProjectInfo(
         messageCollector.check()
     }
 }
-
+// module - data accessor; projectInfo
 class ModuleInfo(val module: Module, val projectInfo: ProjectInfo) {
+    // data source
     private val rootModel = module.rootManager
+    // matcher data storage
     private val expectedDependencyNames = HashSet<String>()
+    // matcher data storage
     private val expectedDependencies = HashSet<OrderEntry>()
+    // matcher data storage
     private val expectedSourceRoots = HashSet<String>()
+    // matcher data storage
     private val expectedExternalSystemTestTasks = ArrayList<ExternalSystemTestRunTask>()
+    // Matcher storage
     private val assertions = mutableListOf<(ModuleInfo) -> Unit>()
+    // Matcher configuration
     private var mustHaveSdk: Boolean = true
-
+    // ???
     private val sourceFolderByPath by lazy {
         rootModel.contentEntries.asSequence()
             .flatMap { it.sourceFolders.asSequence() }
@@ -476,4 +505,4 @@ fun checkProjectStructure(
 private val ExportableOrderEntry.debugText: String
     get() = "$presentableName (${scope.displayName})"
 
-private fun VirtualFile.toIoFile(): File = VfsUtil.virtualToIoFile(this)
+public fun VirtualFile.toIoFile(): File = VfsUtil.virtualToIoFile(this)

@@ -59,6 +59,12 @@ fun AbstractMultiModuleTest.setupMppProjectFromTextFile(testRoot: File) {
     setupMppProjectFromDependenciesFile(dependencies, testRoot)
 }
 
+fun AbstractMultiModuleTest.setupMppProjectFromTextFileWithEntity(testRoot: File) {
+    assert(testRoot.isDirectory) { testRoot.absolutePath + " must be a directory" }
+    val dependencies = dependenciesFile(testRoot)
+    setupMppProjectFromDependenciesFileWithEntity(dependencies, testRoot)
+}
+
 private fun dependenciesFile(testRoot: File) = File(testRoot, "dependencies.txt")
 
 fun AbstractMultiModuleTest.setupMppProjectFromDependenciesFile(dependencies: File, testRoot: File) {
@@ -67,6 +73,41 @@ fun AbstractMultiModuleTest.setupMppProjectFromDependenciesFile(dependencies: Fi
     check(projectModel.modules.isNotEmpty()) { "No modules were parsed from dependencies.txt" }
 
     doSetup(projectModel)
+}
+
+fun AbstractMultiModuleTest.setupMppProjectFromDependenciesFileWithEntity(dependencies: File, testRoot: File) {
+    val projectEntry = ProjectStructureParser(testRoot).parseToProjectEntity(FileUtil.loadFile(dependencies))
+
+    check(projectEntry.modules.isNotEmpty()) { "No modules were parsed from dependencies.txt" }
+
+    doSetup(projectEntry)
+}
+
+fun AbstractMultiModuleTest.doSetup(projectEntity: ProjectEntity) {
+    val resolveModulesToIdeaModules = projectEntity.modules.map { moduleEntity ->
+        // TODO: maybe create ModuleEntity.toOpenapiModule()?
+        val ideaModule = createModule(moduleEntity.name)
+
+        addRoot(
+            ideaModule,
+            moduleEntity.root!!,
+            isTestRoot = false,
+            transformContainedFiles = { if (it.extension == "kt") clearFileFromDiagnosticMarkup(it) }
+        )
+
+        if (moduleEntity.testRoot != null) {
+            addRoot(
+                ideaModule,
+                moduleEntity.testRoot!!,
+                isTestRoot = true,
+                transformContainedFiles = { if (it.extension == "kt") clearFileFromDiagnosticMarkup(it) }
+            )
+        }
+
+        moduleEntity to ideaModule
+    }.toMap()
+
+    // TODO: add remaining part of setUp Project
 }
 
 fun AbstractMultiModuleTest.doSetup(projectModel: ProjectResolveModel) {

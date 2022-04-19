@@ -37,6 +37,16 @@ open class ProjectStructureParser(private val projectRoot: File) {
         return projectBuilder.build()
     }
 
+    fun parseToProjectEntity(text: String): ProjectEntity {
+        val reader = InputStreamReader(text.byteInputStream())
+        while (reader.parseNextDeclaration()) { // TODO: change parsing methods to provide ModuleEntity
+        }
+
+        return ProjectEntity.project {
+            modules = builderByName.values.map { ModuleEntity.fromResolveModule(it.build(), this) }.toMutableList()
+        }
+    }
+
     private fun Reader.parseNextDeclaration(): Boolean {
         val firstWord = nextWord() ?: return false
         when (firstWord) {

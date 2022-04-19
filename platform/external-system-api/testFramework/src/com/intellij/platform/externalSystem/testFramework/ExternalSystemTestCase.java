@@ -65,7 +65,7 @@ public abstract class ExternalSystemTestCase extends UsefulTestCase {
   private File ourTempDir;
 
   protected IdeaProjectTestFixture myTestFixture;
-  protected Project myProject;
+  public Project myProject;
   protected File myTestDir;
   protected VirtualFile myProjectRoot;
   protected VirtualFile myProjectConfig;
@@ -245,7 +245,7 @@ public abstract class ExternalSystemTestCase extends UsefulTestCase {
     return "";
   }
 
-  protected String getProjectPath() {
+  public String getProjectPath() {
     return myProjectRoot.getPath();
   }
 

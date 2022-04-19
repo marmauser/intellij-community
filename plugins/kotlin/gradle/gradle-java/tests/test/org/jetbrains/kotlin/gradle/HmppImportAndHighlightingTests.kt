@@ -17,6 +17,8 @@ import org.jetbrains.kotlin.konan.target.KonanTarget
 import org.jetbrains.kotlin.platform.js.JsPlatforms
 import org.jetbrains.kotlin.platform.jvm.JvmPlatforms
 import org.jetbrains.kotlin.platform.konan.NativePlatforms
+import org.jetbrains.kotlin.projectModel.ProjectEntity
+import org.jetbrains.kotlin.test.matcher.checkProjectEntity
 import org.jetbrains.plugins.gradle.tooling.annotation.PluginTargetVersions
 import org.jetbrains.plugins.gradle.util.GradleConstants
 import org.junit.Assume.assumeTrue
@@ -518,6 +520,25 @@ abstract class HmppImportAndHighlightingTests : MultiplePluginVersionGradleImpor
 
             runInEdtAndWait { VirtualFileManager.getInstance().syncRefresh() }
             ExternalSystemUtil.refreshProject("$projectPath/published-lib-consumer", createImportSpec())
+
+            val messageCollector = MessageCollector()
+            checkProjectEntity(
+                ProjectEntity.importFromOpenapiProject(myProject, projectPath),
+                messageCollector,
+                exhaustiveModuleList = false,
+                exhaustiveSourceSourceRootList = false,
+                exhaustiveDependencyList = false,
+                exhaustiveTestsList = false,
+            ) {
+                allModules {
+                    assertNoDependencyInBuildClasses()
+                }
+                module("lib-and-app")
+                module("lib-and-app.app")
+                module("published-lib-consumer.commonMain") {
+
+                }
+            }
 
             createHighlightingCheck(correspondingFilePostfix = ".after").invokeOnAllModules()
 
